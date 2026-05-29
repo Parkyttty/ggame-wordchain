@@ -3,85 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>끝말잇기 🎮</title>
+  <title>Book1 - Microsoft Excel</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23217346'/><text y='24' x='4' font-size='24' fill='white'>X</text></svg>">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div id="toast-container"></div>
 
-<div class="page-wrap">
+<div class="excel-window">
 
-  <!-- 히어로 -->
-  <div class="hero">
-    <h1 class="hero-title">끝말잇기</h1>
-    <p class="hero-sub">비동기 멀티플레이어 단어 연결 게임 — 친구 링크 공유로 바로 시작!</p>
+  <!-- 제목 표시줄 -->
+  <div class="title-bar">
+    <span class="title-bar-icon">📗</span>
+    <span class="title-bar-name">Book1 - Microsoft Excel</span>
+    <div class="title-bar-btns">
+      <button class="title-bar-btn">─</button>
+      <button class="title-bar-btn">□</button>
+      <button class="title-bar-btn close">✕</button>
+    </div>
   </div>
 
-  <div class="home-grid">
+  <!-- 메뉴바 -->
+  <div class="menu-bar">
+    <div class="menu-item">파일(F)</div>
+    <div class="menu-item">홈(H)</div>
+    <div class="menu-item">삽입(N)</div>
+    <div class="menu-item">페이지 레이아웃(P)</div>
+    <div class="menu-item">수식(M)</div>
+    <div class="menu-item">데이터(A)</div>
+    <div class="menu-item">검토(R)</div>
+    <div class="menu-item">보기(V)</div>
+  </div>
 
-    <!-- 닉네임 카드 -->
-    <div class="card" style="grid-column:1/-1">
-      <div class="card-title">내 닉네임</div>
-      <input class="input" id="nickname-input" type="text" placeholder="닉네임 입력 (2~10자)" maxlength="10" autocomplete="off">
-    </div>
-
-    <!-- 게임 만들기 -->
-    <div class="card">
-      <div class="card-title">🎲 새 게임 만들기</div>
-      <p style="color:var(--muted);font-size:14px;margin-bottom:12px">글자 수 모드를 선택하세요</p>
-      <div class="mode-group">
-        <button class="mode-btn active" data-mode="2">두 글자</button>
-        <button class="mode-btn" data-mode="3">세 글자</button>
-        <button class="mode-btn" data-mode="4">네 글자</button>
+  <!-- 리본 -->
+  <div class="ribbon">
+    <div class="ribbon-group">
+      <div class="ribbon-mode-group">
+        <button class="mode-xl-btn active" data-mode="2">2자</button>
+        <button class="mode-xl-btn" data-mode="3">3자</button>
+        <button class="mode-xl-btn" data-mode="4">4자</button>
       </div>
-      <button class="btn btn-primary btn-full" id="create-btn" style="margin-top:16px">게임 만들기</button>
-      <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">
-        방이 생성되면 링크를 친구에게 공유하세요
-      </p>
+      <span class="ribbon-label">단어 모드</span>
     </div>
-
-    <!-- 게임 참여 -->
-    <div class="card">
-      <div class="card-title">🔗 게임 참여하기</div>
-      <p style="color:var(--muted);font-size:14px;margin-bottom:12px">친구에게 받은 방 코드를 입력하세요</p>
-      <input class="input" id="room-code-input" type="text"
-        placeholder="방 코드 6자리 (예: AB3X2K)" maxlength="6"
-        style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;font-size:18px;text-align:center">
-      <button class="btn btn-secondary btn-full" id="join-btn" style="margin-top:12px">참여하기</button>
+    <div class="ribbon-group">
+      <button class="ribbon-btn" id="create-btn">
+        <span class="ribbon-icon">📋</span>
+        <span class="ribbon-text">새 게임</span>
+      </button>
     </div>
+    <div class="ribbon-group">
+      <div style="display:flex;gap:4px;align-items:center">
+        <input class="xl-input" id="room-code-input" placeholder="방 코드 (6자)" maxlength="6"
+          style="width:90px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;text-align:center">
+        <button class="xl-btn blue" id="join-btn" style="white-space:nowrap">참여</button>
+      </div>
+      <span class="ribbon-label">게임 참여</span>
+    </div>
+    <div class="ribbon-group" style="flex:1">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--xl-muted)">닉네임:</span>
+        <input class="xl-input" id="nickname-input" placeholder="내 이름" maxlength="10"
+          style="width:80px">
+      </div>
+      <span class="ribbon-label">사용자</span>
+    </div>
+  </div>
 
-    <!-- 게임 규칙 -->
-    <div class="card" style="grid-column:1/-1">
-      <div class="card-title">📖 게임 규칙</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
-        <div>
-          <p style="font-weight:700;margin-bottom:6px">🔗 끝말잇기</p>
-          <p style="font-size:14px;color:var(--muted)">이전 단어의 마지막 글자로 시작하는 단어를 입력하세요. 두음법칙(ㄹ↔ㄴ, ㄴ↔ㅇ)도 적용됩니다.</p>
-        </div>
-        <div>
-          <p style="font-weight:700;margin-bottom:6px">⏰ 비동기 플레이</p>
-          <p style="font-size:14px;color:var(--muted)">내 차례일 때 언제든 접속해서 단어를 입력하면 돼요. 실시간으로 반응합니다.</p>
-        </div>
-        <div>
-          <p style="font-weight:700;margin-bottom:6px">🏳️ 승복</p>
-          <p style="font-size:14px;color:var(--muted)">못 이어나갈 것 같으면 입력창에 <strong>승복하겠습니다</strong>를 치면 패배 처리됩니다.</p>
-        </div>
-        <div>
-          <p style="font-weight:700;margin-bottom:6px">🌟 단어 다양성</p>
-          <p style="font-size:14px;color:var(--muted)">전체 게임 이력에서 처음 쓰는 새로운 단어엔 NEW✨ 뱃지와 다양성 점수가 주어집니다.</p>
+  <!-- 수식 표시줄 (장식용) -->
+  <div class="formula-bar">
+    <div class="cell-ref">A1</div>
+    <div class="formula-prefix">fx</div>
+    <div style="padding:0 8px;font-size:12px;color:var(--xl-muted);flex:1">
+      =VLOOKUP("끝말잇기",업무자료!A:Z,1,0)
+    </div>
+  </div>
+
+  <!-- 메인 시트 -->
+  <div class="sheet-area">
+    <table class="spreadsheet" id="main-sheet">
+      <colgroup>
+        <col style="width:28px"><!-- 행번호 -->
+        <col style="width:100px">
+        <col style="width:120px">
+        <col style="width:80px">
+        <col style="width:80px">
+        <col style="width:80px">
+        <col style="width:80px">
+        <col style="width:80px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="col-header"></th>
+          <th class="col-header">A</th>
+          <th class="col-header">B</th>
+          <th class="col-header">C</th>
+          <th class="col-header">D</th>
+          <th class="col-header">E</th>
+          <th class="col-header">F</th>
+          <th class="col-header">G</th>
+        </tr>
+      </thead>
+      <tbody id="sheet-body">
+        <!-- JS로 채워짐 -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 시트 탭 -->
+  <div class="sheet-tabs">
+    <div class="sheet-tab active">끝말잇기</div>
+    <div class="sheet-tab">Sheet2</div>
+    <div class="sheet-tab">Sheet3</div>
+  </div>
+
+  <!-- 상태 표시줄 -->
+  <div class="status-bar" id="status-bar">
+    <div class="status-item">
+      <div class="status-dot"></div>
+      <span>준비</span>
+    </div>
+    <div class="status-item" id="status-info">랭킹 로드 중...</div>
+    <div style="margin-left:auto">시트 수: 3 &nbsp;|&nbsp; 자동 저장: 켜짐</div>
+  </div>
+
+</div>
+
+<!-- 방 만들기 대화상자 -->
+<div class="xl-dialog-overlay" id="create-dialog">
+  <div class="xl-dialog">
+    <div class="xl-dialog-title">
+      <span>새 게임 만들기</span>
+      <button onclick="closeDialog('create-dialog')">✕</button>
+    </div>
+    <div class="xl-dialog-body">
+      <p>새 끝말잇기 방을 만들어 친구에게 링크를 공유하세요.</p>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:var(--xl-muted);display:block;margin-bottom:3px">닉네임</label>
+        <input class="xl-input" id="dialog-nickname" placeholder="내 이름 (2~10자)" maxlength="10">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--xl-muted);display:block;margin-bottom:3px">단어 모드</label>
+        <div style="display:flex;gap:6px">
+          <button class="mode-xl-btn active" data-mode="2" onclick="selectMode(this,2)">두 글자</button>
+          <button class="mode-xl-btn" data-mode="3" onclick="selectMode(this,3)">세 글자</button>
+          <button class="mode-xl-btn" data-mode="4" onclick="selectMode(this,4)">네 글자</button>
         </div>
       </div>
     </div>
-
-    <!-- 랭킹 -->
-    <div class="card" style="grid-column:1/-1">
-      <div class="card-title">🏆 글로벌 랭킹</div>
-      <div id="rankings-list">
-        <div style="text-align:center;padding:24px"><div class="spinner"></div></div>
-      </div>
+    <div class="xl-dialog-footer">
+      <button class="xl-btn" onclick="closeDialog('create-dialog')">취소</button>
+      <button class="xl-btn primary" onclick="createRoom()">만들기</button>
     </div>
-
   </div>
 </div>
 

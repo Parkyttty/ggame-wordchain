@@ -1,15 +1,11 @@
-// ============================================================
-// firebase-config.js
-// Firebase Console > 프로젝트 설정 > 일반 > 내 앱 > 웹앱 설정에서 복사
-// ============================================================
-
+// Firebase 설정 (자동 생성됨)
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyBtFAvCnbtV6j9_u0BxdKjSIZTn82UZxuc",
+  authDomain:        "ggame-wordchain.firebaseapp.com",
+  projectId:         "ggame-wordchain",
+  storageBucket:     "ggame-wordchain.firebasestorage.app",
+  messagingSenderId: "1086502086782",
+  appId:             "1:1086502086782:web:61ac74f1983797d73fd02f"
 };
 
 firebase.initializeApp(firebaseConfig);

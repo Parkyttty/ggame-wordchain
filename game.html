@@ -3,105 +3,227 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>끝말잇기 — 게임 중</title>
+  <title>Book1 - Microsoft Excel</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23217346'/><text y='24' x='4' font-size='24' fill='white'>X</text></svg>">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div id="toast-container"></div>
 
-<div class="page-wrap">
+<div class="excel-window">
 
-  <!-- 헤더 -->
-  <div class="game-header">
-    <button class="btn btn-ghost btn-sm" id="home-btn">← 홈</button>
-    <span class="game-title">끝말잇기</span>
-    <div class="game-meta">
-      <span class="badge badge-purple" id="mode-badge">두글자</span>
-      <span class="badge badge-cyan" id="room-code-header" style="letter-spacing:.1em;font-size:13px">──────</span>
-      <button class="btn btn-ghost btn-sm" id="copy-link-btn">🔗 링크 복사</button>
+  <!-- 제목 표시줄 -->
+  <div class="title-bar">
+    <span class="title-bar-icon">📗</span>
+    <span class="title-bar-name">Book1 - Microsoft Excel</span>
+    <div class="title-bar-btns">
+      <button class="title-bar-btn">─</button>
+      <button class="title-bar-btn">□</button>
+      <button class="title-bar-btn close" onclick="window.location.href='index.html'">✕</button>
     </div>
   </div>
 
-  <!-- 플레이어 목록 -->
-  <div id="players-list" class="players-list">
-    <div class="player-chip"><div class="player-dot"></div><span>불러오는 중…</span></div>
+  <!-- 메뉴바 -->
+  <div class="menu-bar">
+    <div class="menu-item" onclick="window.location.href='index.html'">파일(F)</div>
+    <div class="menu-item">홈(H)</div>
+    <div class="menu-item">삽입(N)</div>
+    <div class="menu-item">페이지 레이아웃(P)</div>
+    <div class="menu-item">수식(M)</div>
+    <div class="menu-item">데이터(A)</div>
+    <div class="menu-item">검토(R)</div>
+    <div class="menu-item">보기(V)</div>
   </div>
 
-  <!-- ── 대기 화면 ── -->
-  <div id="waiting-screen" class="waiting-screen" style="display:none">
-    <p style="color:var(--muted);font-size:15px">친구에게 아래 링크나 코드를 공유하세요!</p>
-
-    <div class="share-box" id="share-box">
-      <div class="room-code" id="room-code-display">──────</div>
-      <div class="share-url" id="share-url"></div>
-      <p style="font-size:12px;color:var(--muted);margin-top:8px">클릭하면 링크가 복사됩니다 📋</p>
+  <!-- 리본 -->
+  <div class="ribbon">
+    <div class="ribbon-group">
+      <button class="ribbon-btn" id="start-btn" style="display:none">
+        <span class="ribbon-icon">▶</span>
+        <span class="ribbon-text">시작</span>
+      </button>
+      <button class="ribbon-btn" id="copy-link-btn">
+        <span class="ribbon-icon">🔗</span>
+        <span class="ribbon-text">링크 복사</span>
+      </button>
     </div>
-
-    <button class="btn btn-primary btn-lg" id="start-btn" style="display:none">
-      🚀 게임 시작!
-    </button>
-    <p style="font-size:13px;color:var(--muted);margin-top:12px">
-      방 만든 사람만 시작할 수 있어요 (최소 2명 필요)
-    </p>
+    <div class="ribbon-group">
+      <span id="mode-badge" style="font-size:18px;font-weight:700;color:var(--xl-green)">─</span>
+      <span class="ribbon-label">모드</span>
+    </div>
+    <div class="ribbon-group">
+      <span id="room-code-display" style="font-size:14px;font-weight:700;letter-spacing:.15em;color:var(--xl-blue)">──────</span>
+      <span class="ribbon-label">방 코드</span>
+    </div>
+    <div class="ribbon-group" style="flex:1">
+      <div id="players-ribbon" style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px"></div>
+      <span class="ribbon-label">참가자</span>
+    </div>
+    <div class="ribbon-group">
+      <button class="ribbon-btn danger" id="surrender-btn">
+        <span class="ribbon-icon">🏳️</span>
+        <span class="ribbon-text">승복</span>
+      </button>
+      <button class="ribbon-btn" id="vote-btn" style="display:none">
+        <span class="ribbon-icon">🗳️</span>
+        <span class="ribbon-text">강제패배 투표</span>
+      </button>
+    </div>
   </div>
 
-  <!-- ── 게임 영역 ── -->
-  <div id="game-area" style="display:none">
-
-    <!-- 단어 히스토리 -->
-    <div class="word-history" id="word-history">
-      <p class="sys-msg">게임을 불러오는 중…</p>
-    </div>
-
-    <!-- 입력 영역 -->
-    <div class="input-area">
-      <div class="input-row">
-        <div class="word-input-wrap">
-          <span class="chain-hint" id="chain-hint"></span>
-          <input class="input word-input" id="word-input" type="text"
-            placeholder="단어 입력 후 Enter…"
-            maxlength="20" autocomplete="off" spellcheck="false" disabled>
-        </div>
-        <button class="btn btn-primary" id="send-btn" disabled>입력</button>
-      </div>
-      <p class="input-hint" id="input-hint">게임을 불러오는 중…</p>
-      <div style="text-align:center">
-        <button class="btn btn-danger btn-sm" id="surrender-btn">🏳️ 승복하겠습니다</button>
-      </div>
-    </div>
-
+  <!-- 수식 표시줄 = 단어 입력창 -->
+  <div class="formula-bar">
+    <div class="cell-ref" id="chain-hint-cell" style="color:var(--xl-green);font-size:16px;font-weight:900">A1</div>
+    <div class="formula-prefix" style="color:var(--xl-green);font-weight:700">fx</div>
+    <input class="formula-input" id="word-input"
+      placeholder="단어를 입력하세요... (승복하겠습니다 = 패배)"
+      maxlength="20" autocomplete="off" spellcheck="false" disabled>
+    <button class="xl-btn primary" id="send-btn" style="margin:2px 4px;padding:2px 12px" disabled>입력</button>
   </div>
+
+  <!-- 투표 현황 바 (평소엔 숨김) -->
+  <div id="vote-bar-section" style="display:none;padding:4px 12px;background:#FFF3E0;border-bottom:1px solid #FFB74D;font-size:12px">
+    <span style="font-weight:700;color:#C55A11">⚠️ 강제 패배 투표 진행 중 — </span>
+    <span id="vote-status-text"></span>
+    <div class="vote-bar-wrap" style="margin-top:4px">
+      <div class="vote-bar"><div class="vote-bar-fill" id="vote-bar-fill" style="width:0%"></div></div>
+      <span id="vote-count-text" style="font-size:11px;color:#C55A11;min-width:60px"></span>
+    </div>
+  </div>
+
+  <!-- 대기 중 안내 (수식 표시줄 아래) -->
+  <div id="input-hint" style="padding:3px 12px;font-size:11px;color:var(--xl-muted);background:var(--xl-formula);border-bottom:1px solid var(--xl-border)">
+    게임 정보를 불러오는 중...
+  </div>
+
+  <!-- 메인 시트 -->
+  <div class="sheet-area">
+    <!-- 대기 화면 -->
+    <div id="waiting-screen" style="display:none;padding:24px">
+      <table class="spreadsheet">
+        <colgroup>
+          <col style="width:28px">
+          <col style="width:120px">
+          <col style="width:300px">
+          <col style="width:200px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="col-header"></th>
+            <th class="col-header">A</th>
+            <th class="col-header">B</th>
+            <th class="col-header">C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-header">1</td>
+            <td class="cell header-row" colspan="3">게임 대기실</td></tr>
+          <tr><td class="row-header">2</td>
+            <td class="cell info-label">방 코드</td>
+            <td class="cell info-value" id="room-code-big" style="font-size:20px;font-weight:900;letter-spacing:.2em;color:var(--xl-blue)">──────</td>
+            <td class="cell"></td></tr>
+          <tr><td class="row-header">3</td>
+            <td class="cell info-label">공유 링크</td>
+            <td class="cell info-value" id="share-url-cell" style="color:var(--xl-blue);font-size:11px;cursor:pointer"
+              onclick="copyLink()">클릭하여 복사</td>
+            <td class="cell"></td></tr>
+          <tr><td class="row-header">4</td>
+            <td class="cell info-label">참가자</td>
+            <td class="cell info-value" id="player-list-cell">—</td>
+            <td class="cell"></td></tr>
+          <tr><td class="row-header">5</td>
+            <td class="cell info-label">모드</td>
+            <td class="cell info-value" id="mode-cell">—</td>
+            <td class="cell"></td></tr>
+          <tr><td class="row-header">6</td>
+            <td class="cell" colspan="3" style="text-align:center;padding:12px">
+              <button class="xl-btn primary" id="start-btn-sheet" style="display:none">▶ 게임 시작</button>
+              <span id="waiting-msg" style="color:var(--xl-muted);font-size:12px">방장이 게임을 시작하면 시작됩니다</span>
+            </td></tr>
+          <tr><td class="row-header">7</td><td class="cell section-sep" colspan="3">TIP: 리본의 [링크 복사] 버튼으로 친구에게 공유하세요</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 게임 진행 시트 -->
+    <div id="game-area" style="display:none">
+      <table class="spreadsheet" id="game-sheet">
+        <colgroup>
+          <col style="width:28px">
+          <col style="width:40px"> <!-- 번호 -->
+          <col style="width:90px"> <!-- 플레이어 -->
+          <col style="width:120px"><!-- 단어 -->
+          <col style="width:70px"> <!-- NEW -->
+          <col style="width:80px"> <!-- 응답시간 -->
+          <col style="width:70px"> <!-- 시각 -->
+          <col style="width:80px"> <!-- 비고 -->
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="col-header"></th>
+            <th class="col-header">A</th>
+            <th class="col-header">B</th>
+            <th class="col-header">C</th>
+            <th class="col-header">D</th>
+            <th class="col-header">E</th>
+            <th class="col-header">F</th>
+            <th class="col-header">G</th>
+          </tr>
+        </thead>
+        <tbody id="game-sheet-body">
+          <!-- JS로 채워짐 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 시트 탭 -->
+  <div class="sheet-tabs">
+    <div class="sheet-tab active">끝말잇기</div>
+    <div class="sheet-tab">Sheet2</div>
+    <div class="sheet-tab">Sheet3</div>
+  </div>
+
+  <!-- 상태 표시줄 -->
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="status-dot" id="conn-dot"></div>
+      <span id="conn-text">연결 중...</span>
+    </div>
+    <div class="status-item" id="game-status-bar">대기 중</div>
+    <div style="margin-left:auto" id="stats-bar">합계: 0 &nbsp;|&nbsp; 개수: 0</div>
+  </div>
+
 </div>
 
-<!-- ── 결과 오버레이 ── -->
-<div class="overlay" id="result-overlay">
-  <div class="overlay-card">
-    <span class="result-emoji" id="result-emoji">🎮</span>
-    <div class="result-title" id="result-title">게임 종료</div>
-    <div class="result-sub"   id="result-sub">수고하셨습니다!</div>
-
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-value" id="stat-words">-</div>
-        <div class="stat-label">입력한 단어</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-avg-rt">-</div>
-        <div class="stat-label">평균 응답시간</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-new">-</div>
-        <div class="stat-label">새 단어 (다양성)</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-result">-</div>
-        <div class="stat-label">결과</div>
-      </div>
+<!-- 결과 대화상자 -->
+<div class="xl-dialog-overlay" id="result-dialog">
+  <div class="xl-dialog">
+    <div class="xl-dialog-title">
+      <span id="result-dialog-title">Microsoft Excel</span>
+      <button onclick="window.location.href='index.html'">✕</button>
     </div>
-
-    <div style="display:flex;gap:10px;margin-top:24px">
-      <button class="btn btn-primary btn-full" id="play-again-btn">🏠 홈으로</button>
+    <div class="xl-dialog-body">
+      <p id="result-msg" style="font-size:16px;font-weight:700;margin-bottom:16px"></p>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <tr style="background:#F0F0F0">
+          <td style="padding:4px 8px;border:1px solid #ccc;font-weight:700">항목</td>
+          <td style="padding:4px 8px;border:1px solid #ccc;font-weight:700">값</td>
+        </tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc">입력한 단어</td>
+            <td style="padding:4px 8px;border:1px solid #ccc" id="r-words">-</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc">평균 응답시간</td>
+            <td style="padding:4px 8px;border:1px solid #ccc" id="r-rt">-</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc">NEW 단어 (다양성)</td>
+            <td style="padding:4px 8px;border:1px solid #ccc" id="r-new">-</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc">결과</td>
+            <td style="padding:4px 8px;border:1px solid #ccc" id="r-result">-</td></tr>
+      </table>
+    </div>
+    <div class="xl-dialog-footer">
+      <button class="xl-btn" onclick="window.location.href='index.html'">홈으로</button>
+      <button class="xl-btn primary" onclick="window.location.href='index.html'">확인</button>
     </div>
   </div>
 </div>
