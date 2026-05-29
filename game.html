@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끝말잇기 — 게임 중</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="page-wrap">
+
+  <!-- 헤더 -->
+  <div class="game-header">
+    <button class="btn btn-ghost btn-sm" id="home-btn">← 홈</button>
+    <span class="game-title">끝말잇기</span>
+    <div class="game-meta">
+      <span class="badge badge-purple" id="mode-badge">두글자</span>
+      <span class="badge badge-cyan" id="room-code-header" style="letter-spacing:.1em;font-size:13px">──────</span>
+      <button class="btn btn-ghost btn-sm" id="copy-link-btn">🔗 링크 복사</button>
+    </div>
+  </div>
+
+  <!-- 플레이어 목록 -->
+  <div id="players-list" class="players-list">
+    <div class="player-chip"><div class="player-dot"></div><span>불러오는 중…</span></div>
+  </div>
+
+  <!-- ── 대기 화면 ── -->
+  <div id="waiting-screen" class="waiting-screen" style="display:none">
+    <p style="color:var(--muted);font-size:15px">친구에게 아래 링크나 코드를 공유하세요!</p>
+
+    <div class="share-box" id="share-box">
+      <div class="room-code" id="room-code-display">──────</div>
+      <div class="share-url" id="share-url"></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px">클릭하면 링크가 복사됩니다 📋</p>
+    </div>
+
+    <button class="btn btn-primary btn-lg" id="start-btn" style="display:none">
+      🚀 게임 시작!
+    </button>
+    <p style="font-size:13px;color:var(--muted);margin-top:12px">
+      방 만든 사람만 시작할 수 있어요 (최소 2명 필요)
+    </p>
+  </div>
+
+  <!-- ── 게임 영역 ── -->
+  <div id="game-area" style="display:none">
+
+    <!-- 단어 히스토리 -->
+    <div class="word-history" id="word-history">
+      <p class="sys-msg">게임을 불러오는 중…</p>
+    </div>
+
+    <!-- 입력 영역 -->
+    <div class="input-area">
+      <div class="input-row">
+        <div class="word-input-wrap">
+          <span class="chain-hint" id="chain-hint"></span>
+          <input class="input word-input" id="word-input" type="text"
+            placeholder="단어 입력 후 Enter…"
+            maxlength="20" autocomplete="off" spellcheck="false" disabled>
+        </div>
+        <button class="btn btn-primary" id="send-btn" disabled>입력</button>
+      </div>
+      <p class="input-hint" id="input-hint">게임을 불러오는 중…</p>
+      <div style="text-align:center">
+        <button class="btn btn-danger btn-sm" id="surrender-btn">🏳️ 승복하겠습니다</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 결과 오버레이 ── -->
+<div class="overlay" id="result-overlay">
+  <div class="overlay-card">
+    <span class="result-emoji" id="result-emoji">🎮</span>
+    <div class="result-title" id="result-title">게임 종료</div>
+    <div class="result-sub"   id="result-sub">수고하셨습니다!</div>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-words">-</div>
+        <div class="stat-label">입력한 단어</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-avg-rt">-</div>
+        <div class="stat-label">평균 응답시간</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-new">-</div>
+        <div class="stat-label">새 단어 (다양성)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-result">-</div>
+        <div class="stat-label">결과</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button class="btn btn-primary btn-full" id="play-again-btn">🏠 홈으로</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/korean-utils.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
