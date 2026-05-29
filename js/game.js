@@ -137,7 +137,7 @@ async function submitWord() {
   // 유효성 검사
   const mode = roomData.mode || 2;
   const result = validateWord(word, mode, roomData.lastWord, Array.from(usedWords));
-  if (!result.valid) { toast(result.reason, 'error'); return; }
+  if (!result.valid) { toast(result.error || '유효하지 않은 단어입니다.', 'error'); return; }
 
   // 응답 시간
   const rt = turnStartTs ? (Date.now() - turnStartTs) : 0;
