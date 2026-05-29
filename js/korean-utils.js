@@ -63,6 +63,59 @@ function isValidChain(prevChar, nextChar) {
   return false;
 }
 
+/* ============================================================
+   표준국어대사전 API 검증
+   ============================================================ */
+const DICT_KEY = 'DD2594B30B3D477747B29465DB2EE2F0';
+const DICT_BASE = 'https://stdict.korean.go.kr/api/search.do';
+
+/**
+ * 표준국어대사전에 단어가 존재하는지 확인
+ * - 직접 호출 → CORS 실패 시 allorigins 프록시 사용
+ * - API 장애 시 fail-open (true 반환)
+ */
+async function checkDictionary(word) {
+  const qs = `key=${DICT_KEY}&q=${encodeURIComponent(word)}&req_type=json&start=1&num=5&advanced=n&type1=word`;
+  const directUrl = `${DICT_BASE}?${qs}`;
+  const proxyUrl  = `https://api.allorigins.win/get?url=${encodeURIComponent(directUrl)}`;
+
+  const tryFetch = async (url, useProxy) => {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    let data;
+    if (useProxy) {
+      const wrapper = await res.json();
+      data = JSON.parse(wrapper.contents);
+    } else {
+      data = await res.json();
+    }
+    return data;
+  };
+
+  for (const [url, proxy] of [[directUrl, false], [proxyUrl, true]]) {
+    try {
+      const data  = await tryFetch(url, proxy);
+      const total = parseInt(data?.channel?.total ?? 0, 10);
+      if (total === 0) return false;
+
+      // 동음이의어 숫자(사과01) 제거 후 정확 매칭 확인
+      const items = data.channel.item
+        ? (Array.isArray(data.channel.item) ? data.channel.item : [data.channel.item])
+        : [];
+      return items.some(item => {
+        const w = (item.word || '').replace(/\d+$/, '').trim();
+        return w === word;
+      });
+    } catch (_) {
+      // 다음 URL 시도
+    }
+  }
+
+  // 모든 시도 실패 → fail-open (단어 허용)
+  console.warn('[사전] API 호출 실패 — 단어 허용 처리');
+  return true;
+}
+
 /**
  * 단어 유효성 종합 검사
  * @returns {{ valid: boolean, error?: string }}

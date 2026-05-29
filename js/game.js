@@ -134,12 +134,25 @@ async function submitWord() {
   const myTurn = order[idx] === currentUser.uid;
   if (!myTurn) { toast('지금은 내 차례가 아닙니다.', 'warning'); return; }
 
-  // 유효성 검사
+  // 1차 유효성 검사 (음절수·끝말·중복)
   const mode = roomData.mode || 2;
   const result = validateWord(word, mode, roomData.lastWord, Array.from(usedWords));
   if (!result.valid) { toast(result.error || '유효하지 않은 단어입니다.', 'error'); return; }
 
-  // 응답 시간
+  // 2차 표준국어대사전 검사
+  const sendBtn2 = document.getElementById('send-btn');
+  const origText = sendBtn2.textContent;
+  sendBtn2.disabled = true;
+  sendBtn2.textContent = '확인 중...';
+  const inDict = await checkDictionary(word);
+  sendBtn2.disabled = false;
+  sendBtn2.textContent = origText;
+  if (!inDict) {
+    toast(`"${word}" — 표준국어대사전에 없는 단어입니다.`, 'error');
+    return;
+  }
+
+  // 응답 시간 (사전 조회 시간 제외)
   const rt = turnStartTs ? (Date.now() - turnStartTs) : 0;
 
   // NEW 단어 여부 (방 내 usedWords 기반)
