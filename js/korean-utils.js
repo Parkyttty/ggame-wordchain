@@ -64,56 +64,54 @@ function isValidChain(prevChar, nextChar) {
 }
 
 /* ============================================================
-   표준국어대사전 API 검증
+   한국어 낱말 검증 — 한국어 위키낱말사전 API
+   (ko.wiktionary.org, origin=* CORS 완전 지원)
    ============================================================ */
-const DICT_KEY = 'DD2594B30B3D477747B29465DB2EE2F0';
-const DICT_BASE = 'https://stdict.korean.go.kr/api/search.do';
 
 /**
- * 표준국어대사전에 단어가 존재하는지 확인
- * - 직접 호출 → CORS 실패 시 allorigins 프록시 사용
- * - API 장애 시 fail-open (true 반환)
+ * 한국어 위키낱말사전에서 단어가 한국어 낱말로 등재되어 있는지 확인
+ * - 페이지 없음 → false
+ * - 카테고리에 "한국어" 또는 "표준어" 포함 → true
+ * - API 장애 → fail-open (true 반환, 게임 멈추지 않음)
  */
 async function checkDictionary(word) {
-  const qs = `key=${DICT_KEY}&q=${encodeURIComponent(word)}&req_type=json&start=1&num=5&advanced=n&type1=word`;
-  const directUrl = `${DICT_BASE}?${qs}`;
-  const proxyUrl  = `https://api.allorigins.win/get?url=${encodeURIComponent(directUrl)}`;
+  const url = `https://ko.wiktionary.org/w/api.php?action=query` +
+    `&titles=${encodeURIComponent(word)}&prop=categories` +
+    `&cllimit=50&format=json&origin=*`;
 
-  const tryFetch = async (url, useProxy) => {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    let data;
-    if (useProxy) {
-      const wrapper = await res.json();
-      data = JSON.parse(wrapper.contents);
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃
+
+    const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      console.warn('[사전] Wiktionary 응답 오류:', res.status);
+      return true; // fail-open
+    }
+
+    const data  = await res.json();
+    const pages = data?.query?.pages;
+    if (!pages) return true;
+
+    const page = Object.values(pages)[0];
+
+    // 페이지 자체가 없으면 사전에 없는 단어
+    if (page.missing !== undefined) return false;
+
+    // 카테고리 중 한국어 낱말 관련 분류가 있는지 확인
+    const cats = (page.categories || []).map(c => c.title);
+    return cats.some(cat => cat.includes('한국어') || cat.includes('표준어'));
+
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      console.warn('[사전] 타임아웃 — 단어 허용 처리');
     } else {
-      data = await res.json();
+      console.warn('[사전] API 오류 — 단어 허용 처리:', e.message);
     }
-    return data;
-  };
-
-  for (const [url, proxy] of [[directUrl, false], [proxyUrl, true]]) {
-    try {
-      const data  = await tryFetch(url, proxy);
-      const total = parseInt(data?.channel?.total ?? 0, 10);
-      if (total === 0) return false;
-
-      // 동음이의어 숫자(사과01) 제거 후 정확 매칭 확인
-      const items = data.channel.item
-        ? (Array.isArray(data.channel.item) ? data.channel.item : [data.channel.item])
-        : [];
-      return items.some(item => {
-        const w = (item.word || '').replace(/\d+$/, '').trim();
-        return w === word;
-      });
-    } catch (_) {
-      // 다음 URL 시도
-    }
+    return true; // fail-open
   }
-
-  // 모든 시도 실패 → fail-open (단어 허용)
-  console.warn('[사전] API 호출 실패 — 단어 허용 처리');
-  return true;
 }
 
 /**
